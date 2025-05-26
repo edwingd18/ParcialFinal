@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  db:
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    image: vagrant-db
+    environment:
+      MYSQL_ROOT_PASSWORD: example_root_pw
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-psecret"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  flask:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+    image: vagrant-flask
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+    environment:
+      FLASK_ENV: production
+      MYSQL_HOST: db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: mydb
+      MYSQL_PORT: 3306
+    ports:
+      - "5000:5000"
+
+  apache:
+    build:
+      context: ./apache
+      dockerfile: Dockerfile
+    image: vagrant-apache
+    depends_on:
+      - flask
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  db_data:
+

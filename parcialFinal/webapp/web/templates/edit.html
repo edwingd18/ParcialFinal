@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Edit User</h2>
+    <!-- Agregar enlace para volver a la página de inicio -->
+    <a href="/" class="btn btn-primary mb-3">Back to Home</a>
+    <form id="edit-user-form">
+        <input type="hidden" id="user-id" value="">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" required>
+        </div>
+	<button type="submit" class="btn btn-primary" onclick="updateUser()">Save Changes</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="/static/script.js"></script>
+<script>
+    // Obtener el ID del usuario de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    //const userId = urlParams.get('id');
+    const userId = {{id}}    
+    // Obtener la información del usuario y llenar el formulario
+    fetch(`/api/users/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('user-id').value = data.id;
+            document.getElementById('name').value = data.name;
+            document.getElementById('email').value = data.email;
+            document.getElementById('username').value = data.username;
+            document.getElementById('password').value = data.password;
+        })
+        .catch(error => console.error('Error:', error));
+</script>
+
+</body>
+</html>
+
